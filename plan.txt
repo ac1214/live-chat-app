@@ -1,0 +1,15 @@
+How to store messages
+
+{
+    user: userid??(primary key),
+    message: message content,
+    time: utc timestamp,
+}
+
+How to store users
+
+{
+    userid: userid,
+    username: user_selected_name,
+    color: user selected color,
+}

@@ -3,7 +3,7 @@
 
 <head>
     <title>Chat App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -17,23 +17,29 @@
 
 <body>
     <div class="container-fluid">
-        <ul id="messages">
-            <li>Test1</li>
-            <li>Test1</li>
-            <li>Test1</li>
-            <li>Test1</li>
-            <li>Test1</li>
-        </ul>
-
-        <form action="">
-            <div class="input-group">
-
-                <input id="m" class="form-control" autocomplete="off" placeholder="Type a message" />
-                <div class="input-group-append">
-                    <button class="btn btn-secondary temp">Send</button>
-                </div>
+        <div class="row full-height">
+            <div class="col-sm-9">
+                <h1>You are </h1>
+                <ul id="messages">
+                </ul>
+                <form action="">
+                    <div class="input-group">
+                        <input id="m" class="form-control" autocomplete="off" placeholder="Type a message" />
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary temp">Send</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </form>
+            <div class="col-sm-3">
+                <h1>Online Users:</h1>
+                <ul id="users">
+                    <li>TempUser1</li>
+                    <li>TempUser1</li>
+                    <li>TempUser1</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </body>
 
