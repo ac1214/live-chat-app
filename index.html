@@ -10,35 +10,29 @@
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row full-height">
-            <div class="col-sm-9">
-                <h1>You are </h1>
-                <ul id="messages">
-                </ul>
-                <form action="">
-                    <div class="input-group">
-                        <input id="m" class="form-control" autocomplete="off" placeholder="Type a message" />
-                        <div class="input-group-append">
-                            <button class="btn btn-secondary temp">Send</button>
-                        </div>
+    <div class="flex flex-wrap">
+        <div id="message-container">
+            <h1 id="userheader">You are </h1>
+            <ul id="messages">
+            </ul>
+            <form action="">
+                <div class="input-group">
+                    <input id="m" class="form-control" autocomplete="off" placeholder="Type a message" />
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary temp">Send</button>
                     </div>
-                </form>
-            </div>
-            <div class="col-sm-3">
-                <h1>Online Users:</h1>
-                <ul id="users">
-                    <li>TempUser1</li>
-                    <li>TempUser1</li>
-                    <li>TempUser1</li>
-                </ul>
-            </div>
+                </div>
+            </form>
+        </div>
+        <div id="user-container">
+            <h1>Online Users:</h1>
+            <ul id="users">
+            </ul>
         </div>
     </div>
 </body>
