@@ -25,22 +25,28 @@ app.get("/styles.css", function(req, res) {
 });
 
 io.on("connection", function(socket) {
-    let username = getUniqueUsername();
-    let userColor = "0000ff";
+    let username;
+    let userColor = "ffffff"; // Set default text color
     let currentUserNumber;
-    userList.push(username);
+
+    console.log(userList);
 
     // Restore previous state from cookies
     socket.on("restore state", function(cookie) {
         let cookieArray = cookie.split(";");
         for (c of cookieArray) {
             let varVal = c.split("=");
+            varVal[0] = varVal[0].trim();
+            varVal[1] = varVal[1].trim();
+
             if (varVal[0] === "username") {
                 if (checkUniqueUsername(varVal[1])) {
                     username = varVal[1];
                 } else {
+                    username = getUniqueUsername;
                     socket.emit("assigned username", username);
                 }
+                userList.push(username);
             } else if (varVal[0] === "color") {
                 if (checkValidColor(varVal[1])) {
                     userColor = varVal[1];
@@ -49,18 +55,22 @@ io.on("connection", function(socket) {
                 currentUserNumber = parseInt(varVal[1]);
             }
         }
-    });
 
-    if (currentUserNumber === undefined) {
-        currentUserNumber = userNumber;
-        userNumber++;
-        socket.emit("assigned number", currentUserNumber);
-    }
+        // If any values were not efined by the cookies, then define them
+        if (currentUserNumber === undefined) {
+            currentUserNumber = userNumber++;
+            socket.emit("assigned number", currentUserNumber);
+        }
+        if (username === undefined) {
+            username = getUniqueUsername();
+            socket.emit("assigned username", username);
+        }
+    });
 
     // Send the newly connected user chat history
     socket.emit("chat history", messages);
     // Send the user the list of people who are online
-    io.emit("online users", userList);
+    //    io.emit("online users", userList);
 
     socket.on("chat message", function(msg) {
         // Check if the message is a command
@@ -110,12 +120,11 @@ io.on("connection", function(socket) {
     function updateNick(newNick) {
         if (checkUniqueUsername()) {
             // Replace old username with new one
-            userList[indexOf(username)] = newNick;
+            userList[userList.indexOf(username)] = newNick;
         } else {
             return false;
         }
-        // Send the user a new list of people who are online
-        io.emit("online users", userList);
+        updateUserList();
         return true;
     }
 
@@ -136,9 +145,6 @@ io.on("connection", function(socket) {
     socket.on("disconnect", reason => {
         userList.splice(userList.indexOf(username), 1);
         console.log(reason);
-
-        // Send the users a new list of people who are online
-        io.emit("online users", userList);
     });
 
     // Update nick color
@@ -146,6 +152,36 @@ io.on("connection", function(socket) {
         // TODO: Update nickcolor here
         console.log(newNickColor);
     });
+
+    // Get a new nickname
+    socket.on("get nick", function() {
+        // If a user number isn't defined then get one
+        if (currentUserNumber === undefined) {
+            currentUserNumber = userNumber++;
+            socket.emit("assigned number", currentUserNumber);
+        }
+        username = getUniqueUsername();
+        userList.push(username);
+
+        socket.emit("assigned username", username);
+    });
+
+    function updateUserList() {
+        // Send the users a new list of people who are online
+        io.emit("online users", userList);
+    }
+
+    function buildErrorMessage(errorMessage) {
+        let errorMessage = {
+            user: "ERROR",
+            userNumber: -1,
+            time: Date.now(),
+            message: errorMessage,
+            color: "ff0000"
+        };
+
+        return errorMessage;
+    }
 });
 
 http.listen(port, function() {

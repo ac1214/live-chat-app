@@ -13,3 +13,14 @@ How to store users
     username: user_selected_name,
     color: user selected color,
 }
+
+[x] Presentation
+[x] Time stamps
+[ ] Nicknames
+[x] Scroll-up text
+[ ] Chat log history
+[ ] Display current users
+[ ] Change nickname
+[ ] Nick color
+[ ] Bold messages
+[ ] Cookies

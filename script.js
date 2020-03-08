@@ -1,11 +1,11 @@
 $(function() {
-    console.log("TEST");
+    $(document).ready(function() {
+        $("#userheader").val("You are " + username);
+    });
 
     var socket = io();
-    let username = "";
+    let username = "fdas";
     let usernumber;
-
-    $("#userheader").html("You are " + username);
 
     $("form").submit(function() {
         // Prevent empty messages from being sent
@@ -34,19 +34,21 @@ $(function() {
         $("#messages").append(
             $(
                 '<li style="color:#' + msg.color + checkSelfMsg(msg) + ';">'
-            ).text(displayMessages(msg) + usernumber)
+            ).text(displayMessages(msg))
         );
         $("#messages").scrollTop($("#messages")[0].scrollHeight);
     }
 
     // Check if the message was sent by us and change the number
     function checkSelfMsg(msg) {
-        return msg.userNumber === usernumber ? ";font-weight:bold" : "";
+        return msg.userNumber == usernumber ? ";font-weight:bold" : "";
     }
 
     // Get list of people online
     socket.on("online users", function(onlineUsers) {
         $("#users").empty();
+
+        console.log(onlineUsers);
 
         for (user of onlineUsers) {
             $("#users").append($("<li>").text(user));
@@ -56,8 +58,12 @@ $(function() {
 
     // When initially connecting to server
     socket.on("connect", () => {
-        // From: https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
-        socket.emit("restore state", document.cookie);
+        // Either restore state or get a new nickname
+        if (document.cookie != "") {
+            socket.emit("restore state", document.cookie);
+        } else {
+            socket.emit("get nick");
+        }
     });
 
     // Get notified if the username has been assigned
