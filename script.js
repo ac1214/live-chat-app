@@ -37,7 +37,7 @@ $(function() {
 
     // Get list of people online
     socket.on("online users", function(onlineUsers) {
-        $("#users").empty();
+        //$("#users").empty();
 
         console.log(onlineUsers);
 
