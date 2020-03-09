@@ -90,7 +90,7 @@ $(function() {
             "</span>";
 
         let msgContent =
-            message.userNumber === usernumber
+            message.user === username
                 ? '<span style="font-weight:bold">' +
                   message.message +
                   "</span>"

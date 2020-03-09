@@ -31,8 +31,6 @@ io.on("connection", function(socket) {
     let userColor = "ffffff"; // Set default text color
     let currentUserNumber = -1;
 
-    console.log(userNumber);
-
     // Restore previous state from cookies
     socket.on("restore state", function(cookie) {
         let cookieArray = cookie.split(";");
@@ -85,7 +83,6 @@ io.on("connection", function(socket) {
         // Get username
         username = getUniqueUsername();
         currentUsers.push(username);
-        console.log(currentUsers);
 
         // Notify the client of it's username and userNumber
         socket.emit("assigned username", username);
@@ -118,9 +115,7 @@ io.on("connection", function(socket) {
                 } else {
                     socket.emit(
                         "chat message",
-                        buildSuccessMessage(
-                            "Updated nickname to " + username;
-                        )
+                        buildSuccessMessage("Updated nickname to " + username)
                     );
                 }
             } else if (command === "nickcolor") {
@@ -136,7 +131,8 @@ io.on("connection", function(socket) {
                     socket.emit(
                         "chat message",
                         buildSuccessMessage(
-                            "Successfully updated nickname color to " + userColor;
+                            "Successfully updated nickname color to " +
+                                userColor
                         )
                     );
                 }
@@ -175,6 +171,7 @@ io.on("connection", function(socket) {
     // Remove user from currentUsers when disconnected
     socket.on("disconnect", reason => {
         currentUsers.splice(currentUsers.indexOf(username), 1);
+        updatecurrentUsers();
     });
 
     function updatecurrentUsers() {
