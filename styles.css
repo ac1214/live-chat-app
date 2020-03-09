@@ -5,6 +5,7 @@ body {
     margin: 0;
     height: 100vh;
     width: 100vw;
+    background-color: #272727;
 }
 
 .flex {
@@ -13,7 +14,7 @@ body {
 
 h1 {
     color: #ffffff;
-    padding: 5px;
+    padding: 7px;
 }
 
 form {
@@ -25,7 +26,6 @@ form {
     margin: 0;
     padding: 0;
     list-style-type: none;
-    background-color: #455a64;
     color: #ffffff;
     overflow-x: auto;
     overflow-y: scroll;
@@ -36,7 +36,7 @@ form {
     display: flex;
     justify-content: flex-end;
     flex-direction: column;
-    background-color: #455a64;
+    background-color: #253237;
     overflow-y: hidden;
 }
 
@@ -79,7 +79,7 @@ form {
     flex-grow: 1;
     height: 100vh;
     width: 20vw;
-    background-color: #24333a;
+    background-color: #1b263b;
 }
 
 @media screen and (max-width: 600px) {
@@ -95,5 +95,9 @@ form {
 
     #user-container {
         width: 100%;
+    }
+
+    #users-div {
+        justify-content: flex-start;
     }
 }

@@ -3,7 +3,9 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var port = process.env.PORT || 3000;
 
+// Store message history
 let messages = [];
+// Keep track of current users
 let currentUsers = [];
 
 let usernameNumber = 1;
@@ -96,9 +98,6 @@ io.on("connection", function(socket) {
         socket.emit("chat history", messages);
     });
 
-    // Send the user the list of people who are online
-    //    io.emit("online users", currentUsers);
-
     socket.on("chat message", function(msg) {
         // Check if the message is a command
         if (msg.charAt(0) === "/") {
@@ -116,6 +115,13 @@ io.on("connection", function(socket) {
                             "Failed to update nickname, choose a unique username"
                         )
                     );
+                } else {
+                    socket.emit(
+                        "chat message",
+                        buildSuccessMessage(
+                            "Updated nickname to " + username;
+                        )
+                    );
                 }
             } else if (command === "nickcolor") {
                 if (!checkValidColor(input)) {
@@ -127,6 +133,12 @@ io.on("connection", function(socket) {
                     );
                 } else {
                     userColor = input;
+                    socket.emit(
+                        "chat message",
+                        buildSuccessMessage(
+                            "Successfully updated nickname color to " + userColor;
+                        )
+                    );
                 }
             } else {
                 socket.emit("chat message", "Invalid command");
@@ -144,16 +156,12 @@ io.on("connection", function(socket) {
 
             io.emit("chat message", message);
         }
-
-        console.log(messages);
     });
 
     function updateNick(newNick) {
         if (checkUniqueUsername(newNick)) {
             // Replace old username with new one
-            console.log("HERE1");
             currentUsers[currentUsers.indexOf(username)] = newNick;
-            console.log(currentUsers);
             username = newNick;
         } else {
             return false;
@@ -167,13 +175,6 @@ io.on("connection", function(socket) {
     // Remove user from currentUsers when disconnected
     socket.on("disconnect", reason => {
         currentUsers.splice(currentUsers.indexOf(username), 1);
-        console.log(reason);
-    });
-
-    // Update nick color
-    socket.on("update nickcolor", function(newNickColor) {
-        // TODO: Update nickcolor here
-        console.log(newNickColor);
     });
 
     function updatecurrentUsers() {
@@ -188,6 +189,18 @@ io.on("connection", function(socket) {
             time: Date.now(),
             message: errorMessage,
             color: "ff0000"
+        };
+
+        return error;
+    }
+
+    function buildSuccessMessage(successMessage) {
+        let error = {
+            user: "Success",
+            userNumber: -1,
+            time: Date.now(),
+            message: successMessage,
+            color: "00ff00"
         };
 
         return error;
