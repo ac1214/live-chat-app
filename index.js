@@ -137,7 +137,10 @@ io.on("connection", function(socket) {
                     );
                 }
             } else {
-                socket.emit("chat message", "Invalid command");
+                socket.emit(
+                    "chat message",
+                    buildErrorMessage("Invalid command")
+                );
             }
         } else {
             // TODO: Store user info here too
