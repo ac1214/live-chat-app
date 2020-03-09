@@ -4,7 +4,7 @@ var io = require("socket.io")(http);
 var port = process.env.PORT || 3000;
 
 let messages = [];
-let userList = [];
+let currentUsers = [];
 
 let usernameNumber = 1;
 let userNumber = 0;
@@ -25,11 +25,11 @@ app.get("/styles.css", function(req, res) {
 });
 
 io.on("connection", function(socket) {
-    let username;
+    let username = "";
     let userColor = "ffffff"; // Set default text color
-    let currentUserNumber;
+    let currentUserNumber = -1;
 
-    console.log(userList);
+    console.log(userNumber);
 
     // Restore previous state from cookies
     socket.on("restore state", function(cookie) {
@@ -43,10 +43,10 @@ io.on("connection", function(socket) {
                 if (checkUniqueUsername(varVal[1])) {
                     username = varVal[1];
                 } else {
-                    username = getUniqueUsername;
-                    socket.emit("assigned username", username);
+                    username = getUniqueUsername();
                 }
-                userList.push(username);
+
+                currentUsers.push(username);
             } else if (varVal[0] === "color") {
                 if (checkValidColor(varVal[1])) {
                     userColor = varVal[1];
@@ -56,21 +56,48 @@ io.on("connection", function(socket) {
             }
         }
 
-        // If any values were not efined by the cookies, then define them
+        // If any values were not defined by the cookies, then define them
         if (currentUserNumber === undefined) {
             currentUserNumber = userNumber++;
-            socket.emit("assigned number", currentUserNumber);
         }
         if (username === undefined) {
             username = getUniqueUsername();
-            socket.emit("assigned username", username);
         }
+
+        // Notify to the client to confirm it's username and userNumber
+        socket.emit("assigned username", username);
+        socket.emit("assigned number", currentUserNumber);
+
+        // Update currentUsers for everyone connected
+        updatecurrentUsers();
+
+        // Send the newly connected user chat history
+        socket.emit("chat history", messages);
     });
 
-    // Send the newly connected user chat history
-    socket.emit("chat history", messages);
+    // Create a new user
+    socket.on("new user", function() {
+        // Assign a user number
+        currentUserNumber = userNumber++;
+
+        // Get username
+        username = getUniqueUsername();
+        currentUsers.push(username);
+        console.log(currentUsers);
+
+        // Notify the client of it's username and userNumber
+        socket.emit("assigned username", username);
+        socket.emit("assigned number", currentUserNumber);
+
+        // Update currentUsers for everyone connected
+        updatecurrentUsers();
+
+        // Send the newly connected user chat history
+        socket.emit("chat history", messages);
+    });
+
     // Send the user the list of people who are online
-    //    io.emit("online users", userList);
+    //    io.emit("online users", currentUsers);
 
     socket.on("chat message", function(msg) {
         // Check if the message is a command
@@ -85,14 +112,18 @@ io.on("connection", function(socket) {
                 if (!updateNick(input)) {
                     socket.emit(
                         "chat message",
-                        "Failed to update nickname, choose a unique username"
+                        buildErrorMessage(
+                            "Failed to update nickname, choose a unique username"
+                        )
                     );
                 }
             } else if (command === "nickcolor") {
                 if (!checkValidColor(input)) {
                     socket.emit(
                         "chat message",
-                        "Failed to update nickname color, choose a valid color"
+                        buildErrorMessage(
+                            "Failed to update nickname color, choose a valid color"
+                        )
                     );
                 } else {
                     userColor = input;
@@ -118,32 +149,24 @@ io.on("connection", function(socket) {
     });
 
     function updateNick(newNick) {
-        if (checkUniqueUsername()) {
+        if (checkUniqueUsername(newNick)) {
             // Replace old username with new one
-            userList[userList.indexOf(username)] = newNick;
+            console.log("HERE1");
+            currentUsers[currentUsers.indexOf(username)] = newNick;
+            console.log(currentUsers);
+            username = newNick;
         } else {
             return false;
         }
-        updateUserList();
+
+        socket.emit("assigned username", username);
+        updatecurrentUsers();
         return true;
     }
 
-    function updateColor(newColor) {
-        if (checkUniqueUsername()) {
-            // Update username and remove old one
-            userList.splice(userList.indexOf(username), 1);
-            userList.push(newNick);
-        } else {
-            return false;
-        }
-        // Send the user a new list of people who are online
-        io.emit("online users", userList);
-        return true;
-    }
-
-    // Remove user from userlist when disconnected
+    // Remove user from currentUsers when disconnected
     socket.on("disconnect", reason => {
-        userList.splice(userList.indexOf(username), 1);
+        currentUsers.splice(currentUsers.indexOf(username), 1);
         console.log(reason);
     });
 
@@ -153,26 +176,13 @@ io.on("connection", function(socket) {
         console.log(newNickColor);
     });
 
-    // Get a new nickname
-    socket.on("get nick", function() {
-        // If a user number isn't defined then get one
-        if (currentUserNumber === undefined) {
-            currentUserNumber = userNumber++;
-            socket.emit("assigned number", currentUserNumber);
-        }
-        username = getUniqueUsername();
-        userList.push(username);
-
-        socket.emit("assigned username", username);
-    });
-
-    function updateUserList() {
+    function updatecurrentUsers() {
         // Send the users a new list of people who are online
-        io.emit("online users", userList);
+        io.emit("online users", currentUsers);
     }
 
     function buildErrorMessage(errorMessage) {
-        let errorMessage = {
+        let error = {
             user: "ERROR",
             userNumber: -1,
             time: Date.now(),
@@ -180,7 +190,7 @@ io.on("connection", function(socket) {
             color: "ff0000"
         };
 
-        return errorMessage;
+        return error;
     }
 });
 
@@ -194,12 +204,13 @@ function getUniqueUsername() {
         usernameNumber++;
         uniqueUsername = "User" + usernameNumber;
     }
+    usernameNumber++;
 
     return uniqueUsername;
 }
 
 function checkUniqueUsername(username) {
-    let index = userList.indexOf(username);
+    let index = currentUsers.indexOf(username);
 
     // If the index is -1 it has not been found and it is a unique username
     if (index == -1) {

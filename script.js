@@ -1,10 +1,10 @@
 $(function() {
     $(document).ready(function() {
-        $("#userheader").val("You are " + username);
+        $("#userheader").html("You are " + username);
     });
 
     var socket = io();
-    let username = "fdas";
+    let username = "";
     let usernumber;
 
     $("form").submit(function() {
@@ -31,17 +31,8 @@ $(function() {
     });
 
     function addMessage(msg) {
-        $("#messages").append(
-            $(
-                '<li style="color:#' + msg.color + checkSelfMsg(msg) + ';">'
-            ).text(displayMessages(msg))
-        );
+        $("#messages").append($("<li>").html(displayMessages(msg)));
         $("#messages").scrollTop($("#messages")[0].scrollHeight);
-    }
-
-    // Check if the message was sent by us and change the number
-    function checkSelfMsg(msg) {
-        return msg.userNumber == usernumber ? ";font-weight:bold" : "";
     }
 
     // Get list of people online
@@ -62,14 +53,15 @@ $(function() {
         if (document.cookie != "") {
             socket.emit("restore state", document.cookie);
         } else {
-            socket.emit("get nick");
+            socket.emit("new user");
         }
     });
 
     // Get notified if the username has been assigned
     socket.on("assigned username", function(assignedUsername) {
-        $("#userheader").html("You are " + assignedUsername);
         username = assignedUsername;
+
+        $("#userheader").html("You are " + username);
         document.cookie = "username=" + username;
     });
 
@@ -90,8 +82,22 @@ $(function() {
         let minutes = time.getMinutes();
         minutes = minutes < 10 ? "0" + minutes : minutes;
 
-        return (
-            hours + ":" + minutes + " " + message.user + ": " + message.message
-        );
+        let user =
+            '<span style="color:#' +
+            message.color +
+            '">' +
+            message.user +
+            "</span>";
+
+        let msgContent =
+            message.userNumber === usernumber
+                ? '<span style="font-weight:bold">' +
+                  message.message +
+                  "</span>"
+                : message.message;
+
+        console.log(usernumber);
+
+        return hours + ":" + minutes + " " + user + ": " + msgContent;
     }
 });

@@ -18,8 +18,8 @@ How to store users
 [x] Time stamps
 [ ] Nicknames
 [x] Scroll-up text
-[ ] Chat log history
-[ ] Display current users
+[x] Chat log history
+[x] Display current users
 [ ] Change nickname
 [ ] Nick color
 [ ] Bold messages
